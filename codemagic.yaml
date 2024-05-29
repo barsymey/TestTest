@@ -35,8 +35,6 @@ workflows:
         - name: Set up code signing settings on Xcode project
           script: | 
               xcode-project use-profiles
-        - name: Set the build number
-          script: #...
           - name: Build the project
             script: | 
               xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
