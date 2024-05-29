@@ -10,8 +10,8 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.asm.e4st3rnl3g3nds
       groups:
-	- 584
-        - 584_ioscred
+      - 584
+       - 584_ioscred
       vars:
         BUILD_SCRIPT: BuildIos
         UNITY_IOS_DIR: ios
