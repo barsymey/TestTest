@@ -70,23 +70,24 @@ vars:
   APP_STORE_APP_ID: 6503296710
 scripts:
   - name: Initialize macOS keychain
-    script: keychain initialize  
+    script: |
+      keychain initialize  
   - name: Activate Unity License
     script: | 
       $UNITY_BIN -batchmode -quit -logFile -serial ${UNITY_SERIAL?} -username ${UNITY_USERNAME?} -password ${UNITY_PASSWORD?}
-    - name: Generate the Xcode project from Unity
-      script: | 
+  - name: Generate the Xcode project from Unity
+    script: | 
         $UNITY_HOME/Contents/MacOS/Unity -batchmode \
           -quit \
           -logFile \
           -projectPath . \
           -executeMethod BuildScript.BuildIos \
           -nographics
-    - name: Set up code signing settings on Xcode project
-      script: | 
+  - name: Set up code signing settings on Xcode project
+    script: | 
         xcode-project use-profiles
-    - name: Set the build number
-      script: #...
+  - name: Set the build number
+    script: #...
     - name: Build the project
       script: | 
         xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
