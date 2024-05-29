@@ -34,14 +34,14 @@ workflows:
                 -nographics
         - name: Set up code signing settings on Xcode project
           script: | 
-              xcode-project use-profiles
-          - name: Build the project
-            script: | 
-              xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
-          artifacts:
+           xcode-project use-profiles
+        - name: Build the project
+          script: | 
+             xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+      artifacts:
             - build/ios/ipa/*.ipa
             - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-          publishing:
+      publishing:
             scripts:
               - name: Deactivate Unity License
                 script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
