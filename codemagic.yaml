@@ -5,7 +5,7 @@ workflows:
       environment:
           ios_signing:
               distribution_type: app_store
-              bundle_identifier: io.codemagic.unitysample
+              bundle_identifier: com.asm.e4st3rnl3g3nds
           groups:
             - unity
             - ios_credentials
