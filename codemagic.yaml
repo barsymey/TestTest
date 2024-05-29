@@ -1,83 +1,41 @@
 workflows:
-  unity-ios-workflow:
-    name: Unity iOS Workflow
-    instance_type: mac_mini_m1
-    max_build_duration: 120
-    integrations:
-      app_store_connect: codemagic
-    environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.asm.e4st3rnl3g3nds
-      groups:
-      - 584
-       - 584_ioscred
-      vars:
-        BUILD_SCRIPT: BuildIos
-        UNITY_IOS_DIR: ios
-        XCODE_PROJECT: "Unity-iPhone.xcodeproj"
-        XCODE_SCHEME: "Unity-iPhone"
-        APP_STORE_APP_ID: 6503296710
-      cocoapods: default
-    scripts:
-      - name: Activate Unity License
-        script: |
-          $UNITY_HOME/Contents/MacOS/Unity -batchmode -quit -logFile \
-            -serial ${UNITY_SERIAL?} \
-            -username ${UNITY_EMAIL?} \
-            -password ${UNITY_PASSWORD?}
-      - name: Generate the Xcode project from Unity
-        script: |
-          $UNITY_HOME/Contents/MacOS/Unity -batchmode \
-            -quit \
-            -logFile \
-            -projectPath . \
-            -executeMethod BuildScript.$BUILD_SCRIPT \
-            -nographics
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles
-      - name: Increment build number
-        script: |
-          BUILD_NUMBER=($(app-store-connect get-latest-app-store-build-number "$APP_ID") + 1)
-          cd $UNITY_IOS_DIR
-          agvtool new-version -all $BUILD_NUMBER
-      - name: Build ipa for distribution
-        script: |
-          xcode-project build-ipa \
-            --project "$UNITY_IOS_DIR/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+   -unity-ios-release-workflow:
+      name: Unity iOS release workflow
+      max_build_duration: 120
+vars:
+  UNITY_BIN: ${UNITY_HOME}/Contents/MacOS/Unity
+  BUILD_SCRIPT: BuildIos 
+  UNITY_IOS_DIR: ios
+  XCODE_PROJECT: "Unity-iPhone.xcodeproj"
+  XCODE_SCHEME: "Unity-iPhone"
+  BUNDLE_ID: com.asm.e4st3rnl3g3nds
+  APP_STORE_APP_ID: 6503296710
+scripts:
+  - name: Initialize macOS keychain
+    script: keychain initialize  
+  - name: Activate Unity License
+    script: | 
+      $UNITY_BIN -batchmode -quit -logFile -serial ${UNITY_SERIAL?} -username ${UNITY_USERNAME?} -password ${UNITY_PASSWORD?}
+  - name: Build the Xcode project
+    script: $UNITY_BIN -batchmode -quit -logFile -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics
+  - name: Fetch signing files
+    script: app-store-connect fetch-signing-files $BUNDLE_ID --type IOS_APP_STORE
+  - name: Add certificates to default keychain
+    script: keychain add-certificates
+  - name: Set up code signing settings on Xcode project
+    script: xcode-project use-profiles
+  - name: Increment build number
+    script: | 
+      cd ios && agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID") + 1))
+  - name: Build ipa for distribution
+    script: xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
       scripts:
         - name: Deactivate Unity License
-          script: | 
-            /Applications/Unity\ Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client \
-            --return-ulf \
-            --username ${UNITY_EMAIL?} \
-            --password ${UNITY_PASSWORD?}
-      email:
-        recipients:
-          - user_1@example.com
-          - user_2@example.com
-        notify:
-          success: true
-          failure: false
-      app_store_connect:
-        auth: integration
-        #
-        # Configuration related to TestFlight (optional)
-        # Note: This action is performed during post-processing.
-        submit_to_testflight: true 
-        #
-        # Specify the names of beta tester groups that will get access 
-        # to the build once it has passed beta review.
-        beta_groups:
-          - group name 1
-          - group name 2
-        #
-        # Configuration related to App Store (optional)
-        # Note: This action is performed during post-processing.
-        submit_to_app_store: true
+          script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
+      app_store_connect:            
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY         
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
