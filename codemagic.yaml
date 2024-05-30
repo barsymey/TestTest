@@ -7,7 +7,6 @@ workflows:
         - '584'
         - '584_ioscred'
       vars:
-        UNITY_BIN: $UNITY_HOME/Contents/MacOS/Unity
         BUILD_SCRIPT: BuildIos 
         UNITY_IOS_DIR: ios
         XCODE_PROJECT: "Unity-iPhone.xcodeproj"
