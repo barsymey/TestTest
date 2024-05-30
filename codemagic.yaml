@@ -6,14 +6,14 @@ workflows:
       groups:
           - 584
           - 584_ioscred
-    vars:
-      UNITY_BIN: ${UNITY_HOME}/Contents/MacOS/Unity
-      BUILD_SCRIPT: BuildIos 
-      UNITY_IOS_DIR: ios
-      XCODE_PROJECT: "Unity-iPhone.xcodeproj"
-      XCODE_SCHEME: "Unity-iPhone"
-      BUNDLE_ID: com.asm.e4st3rnl3g3nds
-      APP_STORE_APP_ID: 6503296710
+      vars:
+        UNITY_BIN: ${UNITY_HOME}/Contents/MacOS/Unity
+        BUILD_SCRIPT: BuildIos 
+        UNITY_IOS_DIR: ios
+        XCODE_PROJECT: "Unity-iPhone.xcodeproj"
+        XCODE_SCHEME: "Unity-iPhone"
+        BUNDLE_ID: com.asm.e4st3rnl3g3nds
+        APP_STORE_APP_ID: 6503296710
     scripts:
       - name: Hello world
         script: -echo "Hello"
