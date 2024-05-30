@@ -33,13 +33,13 @@ scripts:
       cd ios && agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID") + 1))
   - name: Build ipa for distribution
     script: xcode-project build-ipa --project "$UNITY_IOS_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
-    artifacts:
+artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      scripts:
-        - name: Deactivate Unity License
-          script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
-      app_store_connect:            
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY         
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+publishing:
+  scripts:
+    - name: Deactivate Unity License
+      script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
+  app_store_connect:            
+    api_key: $APP_STORE_CONNECT_PRIVATE_KEY         
+    key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+    issuer_id: $APP_STORE_CONNECT_ISSUER_ID
