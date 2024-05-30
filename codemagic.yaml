@@ -16,6 +16,8 @@ workflows:
         APP_STORE_APP_ID: 6503296710
     scripts:
       - name: Initialize macOS keychain
+        script: echo UNITY_HOME
+      - name: Initialize macOS keychain
         script: keychain initialize  
       - name: Activate Unity License
         script: | 
